@@ -1,0 +1,1 @@
+mongoimport --db storiesDB --collection stories --drop --file /Short_Stories.json --jsonArray
