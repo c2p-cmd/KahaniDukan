@@ -1,20 +1,25 @@
 package org.thakur.kahanidukan.services;
 
 import org.springframework.stereotype.Service;
-import org.thakur.kahanidukan.models.AuthorNotFoundException;
-import org.thakur.kahanidukan.models.ContentNotFoundException;
-import org.thakur.kahanidukan.models.Story;
-import org.thakur.kahanidukan.services.repository.StoryRepository;
+
+import org.thakur.kahanidukan.models.*;
+
+import org.thakur.kahanidukan.services.repository.*;
 
 import java.util.*;
 
 @Service
 public class StoryService {
     private final StoryRepository storyRepository;
+    private final StorySearchRepository storySearchRepository;
     private final Random random;
 
-    public StoryService(StoryRepository storyRepository) {
+    public StoryService(
+        StoryRepository storyRepository,
+        StorySearchRepository storySearchRepository
+    ) {
         this.storyRepository = storyRepository;
+        this.storySearchRepository = storySearchRepository;
         this.random = new Random();
     }
 
@@ -32,28 +37,37 @@ public class StoryService {
         if (author == null || author.isBlank() || author.equalsIgnoreCase("null")) {
             throw new AuthorNotFoundException("Author not found");
         }
-        if (getAllAuthors().contains(author)) {
-            return storyRepository.findByAuthor(author);
+        final List<Story> storiesByAuthor = storyRepository.findByAuthor(author);
+        if (storiesByAuthor == null) {
+            throw new AuthorNotFoundException("Author not found");
         }
-        throw new AuthorNotFoundException("Author not found");
+        if (storiesByAuthor.isEmpty()) {
+            throw new AuthorNotFoundException("Author not found");
+        }
+        return storiesByAuthor;
     }
 
     public List<String> getAllAuthors() {
-        return storyRepository
-                .findAll()
+        return getAllStories()
                 .stream()
                 .map(Story::author)
+                .distinct()
                 .toList();
     }
 
-    public Story getStoryById(String id) throws ContentNotFoundException {
-        return storyRepository
-                .findById(id)
-                .orElseThrow(() -> new ContentNotFoundException("Story not found for id: " + id));
+    public Story getStoryById(String id) {
+        return storyRepository.findById(id).orElseThrow(() -> new ContentNotFoundException("Story not found for id: " + id));
     }
 
     public void removeStoryById(String id) {
-        storyRepository.deleteById(id);
+        storyRepository
+            .findById(id)
+            .ifPresentOrElse(
+                storyRepository::delete,
+                () -> {
+                    throw new ContentNotFoundException("Story not found for id: " + id);
+                }
+            );
     }
 
     public boolean removeStoriesByAuthor(String author) {
@@ -67,5 +81,14 @@ public class StoryService {
 
     public void addStory(Story newStory) {
         storyRepository.insert(newStory);
+    }
+
+    public List<Story> searchStories(String query) {
+        return storySearchRepository
+                .findByTextSortedByRelevance(query)
+                .stream()
+                .sorted(Comparator.comparingDouble(StoryWithTextScore::score))
+                .map(StoryWithTextScore::toStory)
+                .toList();
     }
 }

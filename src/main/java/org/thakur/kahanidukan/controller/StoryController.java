@@ -1,23 +1,41 @@
 package org.thakur.kahanidukan.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.thakur.kahanidukan.models.AuthorNotFoundException;
-import org.thakur.kahanidukan.models.ContentNotFoundException;
-import org.thakur.kahanidukan.models.Message;
-import org.thakur.kahanidukan.models.Story;
+import org.thakur.kahanidukan.models.*;
 import org.thakur.kahanidukan.services.StoryService;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @RestController
 @RequestMapping("/stories")
-
 public class StoryController {
     private final StoryService storyService;
 
     public StoryController(StoryService storyService) {
         this.storyService = storyService;
+    }
+
+    private static void validateStoryElseThrow(Story story) throws ContentNotFoundException, AuthorNotFoundException, DateTimeInFutureException {
+        if (story.story() == null || story.story().isBlank()) {
+            throw new ContentNotFoundException("Story is required");
+        }
+        if (story.moral() == null || story.moral().isBlank()) {
+            throw new ContentNotFoundException("Moral is required");
+        }
+        if (story.author() == null || story.author().isBlank()) {
+            throw new AuthorNotFoundException("Author is required");
+        }
+        if (story.datetime() == null || story.datetime().isBlank()) {
+            throw new ContentNotFoundException("Datetime is required");
+        }
+        final ZonedDateTime now = ZonedDateTime.now();
+        final ZonedDateTime storyDatetime = ZonedDateTime.parse(story.datetime(), Story.formatter);
+        if (storyDatetime.isAfter(now)) {
+            throw new DateTimeInFutureException();
+        }
     }
 
     // Get all stories
@@ -51,52 +69,42 @@ public class StoryController {
     }
 
     // Post new story
-    @RequestMapping(value = "story", method = RequestMethod.POST)
-    public Message addStory(@RequestBody Story story) {
-        if (story.author() == null || story.author().isBlank() || story.author().equalsIgnoreCase("null")) {
-            throw new AuthorNotFoundException("Author is required");
-        }
+    @RequestMapping(value = "/story", method = RequestMethod.POST)
+    public ResponseEntity<Message> addStory(@RequestBody Story story) {
+        StoryController.validateStoryElseThrow(story);
+
         storyService.addStory(story);
-        return new Message("Story added successfully");
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new Message("Story added successfully"));
     }
 
     // Update story
-    @RequestMapping(value = "story", method = RequestMethod.PUT)
-    public Message updateStory(@RequestBody Story story) {
-        if (story.author() == null || story.author().isBlank() || story.author().equalsIgnoreCase("null")) {
-            throw new IllegalArgumentException("Author is required");
+    @RequestMapping(value = "/story", method = RequestMethod.PUT)
+    public ResponseEntity<Message> updateStory(@RequestBody Story story) {
+        if (story.id() == null || story.id().isBlank()) {
+            throw new ContentNotFoundException("Story ID is required");
         }
-        if (story.story() == null || story.story().isBlank() || story.story().equalsIgnoreCase("null")) {
-            throw new IllegalArgumentException("Story is required");
-        }
-        if (story.moral() == null || story.moral().isBlank() || story.moral().equalsIgnoreCase("null")) {
-            throw new IllegalArgumentException("Moral is required");
-        }
-        if (story.title() == null || story.title().isBlank() || story.title().equalsIgnoreCase("null")) {
-            throw new IllegalArgumentException("Title is required");
-        }
-        if (story.datetime() == null || story.datetime().isBlank() || story.datetime().equalsIgnoreCase("null")) {
-            throw new IllegalArgumentException("Datetime is required");
-        }
-        final LocalDateTime now = LocalDateTime.now();
-        final LocalDateTime storyDatetime = LocalDateTime.parse(story.datetime());
-        if (storyDatetime.isAfter(now)) {
-            throw new IllegalArgumentException("Datetime cannot be in the future");
-        }
+        StoryController.validateStoryElseThrow(story);
+
         storyService.removeStoryById(story.id());
         storyService.addStory(story);
-        return new Message("Story updated successfully");
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(new Message("Story updated successfully"));
     }
 
     // Delete a story
-    @RequestMapping(value = "story", method = RequestMethod.DELETE)
-    public Message deleteStory(@RequestParam String id) {
+    @RequestMapping(value = "/story", method = RequestMethod.DELETE)
+    public ResponseEntity<Message> deleteStory(@RequestParam String id) {
         storyService.removeStoryById(id);
-        return new Message("Story deleted successfully");
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(new Message("Story deleted successfully"));
     }
 
     // Delete stories by author
-    @RequestMapping(value = "author", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/author", method = RequestMethod.DELETE)
     public Message deleteStoriesByAuthor(@RequestParam String author) {
         final boolean didDelete = storyService.removeStoriesByAuthor(author);
         if (didDelete) {
@@ -104,5 +112,11 @@ public class StoryController {
         } else {
             throw new ContentNotFoundException("No stories found for author: " + author);
         }
+    }
+
+    // Search for stories
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    public List<Story> searchStories(@RequestParam String query) {
+        return storyService.searchStories(query);
     }
 }

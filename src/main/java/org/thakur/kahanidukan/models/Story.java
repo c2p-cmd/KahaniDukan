@@ -1,5 +1,7 @@
 package org.thakur.kahanidukan.models;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.ZonedDateTime;
@@ -7,7 +9,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Document(collection = "stories")
-public record Story(String id, String datetime, String title, String story, String moral, String author) {
+public record Story(
+    @Id String id,
+    String datetime,
+    @TextIndexed String title,
+    String story,
+    String moral,
+    String author
+) {
+    static public DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+
     public Story(String id, String datetime, String title, String story, String moral, String author) {
         if (id == null) {
             this.id = UUID.randomUUID().toString();
@@ -40,6 +51,4 @@ public record Story(String id, String datetime, String title, String story, Stri
         this.moral = moral;
         this.author = author;
     }
-
-    static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 }
