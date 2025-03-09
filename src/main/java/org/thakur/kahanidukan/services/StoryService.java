@@ -4,8 +4,7 @@ import org.springframework.stereotype.Service;
 import org.thakur.kahanidukan.models.Story;
 import org.thakur.kahanidukan.services.repository.StoryRepository;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class StoryService {
@@ -31,7 +30,23 @@ public class StoryService {
         return storyRepository.findByAuthor(author);
     }
 
+    public List<String> getAllAuthors() {
+        return storyRepository
+                .findAll()
+                .stream()
+                .map(Story::author)
+                .toList();
+    }
+
     public Story getStoryById(String id) {
         return storyRepository.findById(id).orElse(null);
+    }
+
+    public void removeStoryById(String id) {
+        storyRepository.deleteById(id);
+    }
+
+    public void addStory(Story newStory) {
+        storyRepository.insert(newStory);
     }
 }
