@@ -81,14 +81,34 @@ public class StoryController {
 
     // Update story
     @RequestMapping(value = "/story", method = RequestMethod.PUT)
-    public ResponseEntity<Message> updateStory(@RequestBody Story story) {
-        if (story.id() == null || story.id().isBlank()) {
+    public ResponseEntity<Message> updateStory(@RequestParam String storyId, @RequestBody StoryRequest newStory) {
+        if (storyId == null || storyId.isBlank()) {
             throw new ContentNotFoundException("Story ID is required");
         }
-        StoryController.validateStoryElseThrow(story);
 
-        storyService.removeStoryById(story.id());
-        storyService.addStory(story);
+        Story storyToUpdate = storyService.getStoryById(storyId);
+        String title = storyToUpdate.title();
+        String author = storyToUpdate.author();
+        String datetime = storyToUpdate.datetime();
+        String moral = storyToUpdate.moral();
+
+        if (newStory.title() == null || newStory.title().isBlank()) {
+            title = storyToUpdate.title();
+        }
+        if (newStory.moral() == null || newStory.moral().isBlank()) {
+            moral = storyToUpdate.moral();
+        }
+        if (newStory.datetime() == null || newStory.datetime().isBlank()) {
+            datetime = storyToUpdate.datetime();
+        }
+        if (newStory.author() == null || newStory.author().isBlank()) {
+            author = storyToUpdate.author();
+        }
+
+        storyToUpdate = new Story(storyId, datetime, title, newStory.story(), moral, author);
+
+        storyService.removeStoryById(storyId);
+        storyService.addStory(storyToUpdate);
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .body(new Message("Story updated successfully"));
