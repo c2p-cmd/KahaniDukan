@@ -67,21 +67,22 @@ mongoimport --uri="mongodb://localhost:27017/mydatabase" --collection=stories --
 
 ## API Endpoints
 
-| Method | Endpoint                                              | Description                      |
-|--------|-------------------------------------------------------|----------------------------------|
-| GET    | /stories                                              | Get all stories                  |
-| GET    | /stories/random                                       | Get a random story               |
-| GET    | /stories/authors                                      | Get list of all authors          |
-| GET    | /stories/author?author={name}                         | Get stories by author            |
-| GET    | /stories/story?id={id}                                | Get story by ID                  |
-| POST   | /stories/story                                        | Add a new story                  |
-| PUT    | /stories/story                                        | Update an existing story         |
-| DELETE | /stories/story?id={id}                                | Delete a story by ID             |
-| DELETE | /stories/author?author={name}                         | Delete all stories by an author  |
-| GET    | /stories/search?query={text}                          | Search for stories               |
-| GET    | /text-processor/word-frequency?storyId={id}&limit={n} | Get word frequency for a story   |
-| GET    | /text-processor/summarize?storyId={id}                | Summarize a story using TextRank |
-| GET    | /text-processor/top-10-longest-stories                | Get the 10 longest stories       |
+| Method | Endpoint                                              | Description                                          |
+|--------|-------------------------------------------------------|------------------------------------------------------|
+| GET    | /stories?sortingOrder={order}                         | Get all stories with optional sorting by date        |
+|        |                                                       | (order: 'asc', 'desc', or 'none', default is 'none') |
+| GET    | /stories/random                                       | Get a random story                                   |
+| GET    | /stories/authors                                      | Get list of all authors                              |
+| GET    | /stories/author?author={name}                         | Get stories by author                                |
+| GET    | /stories/story?id={id}                                | Get story by ID                                      |
+| POST   | /stories/story                                        | Add a new story                                      |
+| PUT    | /stories/story                                        | Update an existing story                             |
+| DELETE | /stories/story?id={id}                                | Delete a story by ID                                 |
+| DELETE | /stories/author?author={name}                         | Delete all stories by an author                      |
+| GET    | /stories/search?query={text}                          | Search for stories                                   |
+| GET    | /text-processor/word-frequency?storyId={id}&limit={n} | Get word frequency for a story                       |
+| GET    | /text-processor/summarize?storyId={id}                | Summarize a story using TextRank                     |
+| GET    | /text-processor/top-10-longest-stories                | Get the 10 longest stories                           |
 
 ## Story Model
 
