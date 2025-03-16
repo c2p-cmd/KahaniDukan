@@ -91,4 +91,13 @@ public class StoryService {
                 .map(StoryWithTextScore::toStory)
                 .toList();
     }
+
+    public List<Story> top10LongestStories() {
+        return storyRepository
+                .findAll()
+                .stream()
+                .sorted((s1, s2) -> s2.story().length() - s1.story().length())
+                .limit(10)
+                .toList();
+    }
 }
