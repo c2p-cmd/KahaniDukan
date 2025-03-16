@@ -40,8 +40,8 @@ public class StoryController {
 
     // Get all stories
     @RequestMapping(method = RequestMethod.GET)
-    public List<Story> getAllStories() {
-        return storyService.getAllStories();
+    public List<Story> getAllStories(@RequestParam(defaultValue = "none") String sortingOrder) {
+        return storyService.getAllStoriesSortedByDate(sortingOrder);
     }
 
     // Get random story

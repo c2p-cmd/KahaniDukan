@@ -27,6 +27,15 @@ public class StoryService {
         return storyRepository.findAll();
     }
 
+    public List<Story> getAllStoriesSortedByDate(String sortingOrder) throws BadSortingOrderException {
+        return switch (sortingOrder) {
+            case "asc" -> storyRepository.findAllByOrderByDatetimeAsc();
+            case "desc" -> storyRepository.findAllByOrderByDatetimeDesc();
+            case "none" -> storyRepository.findAll();
+            default -> throw new BadSortingOrderException("Bad sorting order. Use values 'asc', 'desc', or 'none'");
+        };
+    }
+
     public Story getRandomStory() {
         final List<Story> stories = storyRepository.findAll();
         final int randomIndex = random.nextInt(stories.size());

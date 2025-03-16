@@ -7,4 +7,8 @@ import java.util.List;
 
 public interface StoryRepository extends MongoRepository<Story, String> {
     List<Story> findByAuthor(String author);
+
+    List<Story> findAllByOrderByDatetimeAsc();
+
+    List<Story> findAllByOrderByDatetimeDesc();
 }
