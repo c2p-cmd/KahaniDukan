@@ -70,10 +70,10 @@ public class StoryController {
 
     // Post new story
     @RequestMapping(value = "/story", method = RequestMethod.POST)
-    public ResponseEntity<Message> addStory(@RequestBody Story story) {
-        StoryController.validateStoryElseThrow(story);
+    public ResponseEntity<Message> addStory(@RequestBody StoryRequest storyRequest) {
+        StoryController.validateStoryElseThrow(storyRequest.toStory());
 
-        storyService.addStory(story);
+        storyService.addStory(storyRequest.toStory());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new Message("Story added successfully"));
@@ -95,11 +95,11 @@ public class StoryController {
         if (newStory.title() == null || newStory.title().isBlank()) {
             title = storyToUpdate.title();
         }
+        if (newStory.story() == null || newStory.story().isBlank()) {
+            throw new EmptyStoryException();
+        }
         if (newStory.moral() == null || newStory.moral().isBlank()) {
             moral = storyToUpdate.moral();
-        }
-        if (newStory.datetime() == null || newStory.datetime().isBlank()) {
-            datetime = storyToUpdate.datetime();
         }
         if (newStory.author() == null || newStory.author().isBlank()) {
             author = storyToUpdate.author();
@@ -125,10 +125,12 @@ public class StoryController {
 
     // Delete stories by author
     @RequestMapping(value = "/author", method = RequestMethod.DELETE)
-    public Message deleteStoriesByAuthor(@RequestParam String author) {
+    public ResponseEntity<Message> deleteStoriesByAuthor(@RequestParam String author) {
         final boolean didDelete = storyService.removeStoriesByAuthor(author);
         if (didDelete) {
-            return new Message("Stories deleted successfully");
+            return ResponseEntity
+                    .status(HttpStatus.ACCEPTED)
+                    .body(new Message("Stories deleted successfully"));
         } else {
             throw new ContentNotFoundException("No stories found for author: " + author);
         }
