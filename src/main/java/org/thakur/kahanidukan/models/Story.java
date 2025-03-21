@@ -1,5 +1,6 @@
 package org.thakur.kahanidukan.models;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,6 +12,7 @@ import java.util.UUID;
 @Document(collection = "stories")
 public record Story(
     @Id String id,
+    @CreatedDate
     String datetime,
     @TextIndexed String title,
     String story,
@@ -37,15 +39,16 @@ public record Story(
         if (author.isBlank() || author.equalsIgnoreCase("null")) {
             throw new AuthorNotFoundException("Author is required");
         }
-        if (datetime.isBlank() || datetime.equalsIgnoreCase("null")) {
-            throw new ContentNotFoundException("Datetime is required");
+        if (datetime == null || datetime.isBlank() || datetime.equalsIgnoreCase("null")) {
+            this.datetime = ZonedDateTime.now().format(formatter);
+        } else {
+            final ZonedDateTime now = ZonedDateTime.now();
+            final ZonedDateTime dateTime = ZonedDateTime.parse(datetime, Story.formatter);
+            if (dateTime.isAfter(now)) {
+                throw new ContentNotFoundException("Datetime cannot be in the future");
+            }
+            this.datetime = datetime;
         }
-        final ZonedDateTime now = ZonedDateTime.now();
-        final ZonedDateTime dateTime = ZonedDateTime.parse(datetime, Story.formatter);
-        if (dateTime.isAfter(now)) {
-            throw new ContentNotFoundException("Datetime cannot be in the future");
-        }
-        this.datetime = datetime;
         this.title = title;
         this.story = story;
         this.moral = moral;
