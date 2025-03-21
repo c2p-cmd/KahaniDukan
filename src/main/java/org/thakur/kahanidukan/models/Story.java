@@ -16,8 +16,8 @@ public record Story(
     @Id String id,
     @CreatedDate
     String datetime,
-    @TextIndexed String title,
-    String story,
+    String title,
+    @TextIndexed String story,
     String moral,
     String author
 ) {
