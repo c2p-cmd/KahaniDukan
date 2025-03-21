@@ -24,16 +24,16 @@ public class StoryController {
 
     private static void validateStoryElseThrow(Story story) throws ContentNotFoundException, AuthorNotFoundException, DateTimeInFutureException {
         if (story.story() == null || story.story().isBlank()) {
-            throw new ContentNotFoundException("Story is required");
+            throw new ContentNotFoundException();
         }
         if (story.moral() == null || story.moral().isBlank()) {
-            throw new ContentNotFoundException("Moral is required");
+            throw new ContentNotFoundException();
         }
         if (story.author() == null || story.author().isBlank()) {
             throw new AuthorNotFoundException("Author is required");
         }
         if (story.datetime() == null || story.datetime().isBlank()) {
-            throw new ContentNotFoundException("Datetime is required");
+            throw new ContentNotFoundException();
         }
         final ZonedDateTime now = ZonedDateTime.now();
         final ZonedDateTime storyDatetime = ZonedDateTime.parse(story.datetime(), Story.formatter);
@@ -87,7 +87,7 @@ public class StoryController {
     @RequestMapping(value = "/story", method = RequestMethod.PUT)
     public ResponseEntity<Message> updateStory(@RequestParam String storyId, @RequestBody StoryRequest newStory) {
         if (storyId == null || storyId.isBlank()) {
-            throw new ContentNotFoundException("Story ID is required");
+            throw new ContentNotFoundException();
         }
 
         Story storyToUpdate = storyService.getStoryById(storyId);
@@ -136,7 +136,7 @@ public class StoryController {
                     .status(HttpStatus.ACCEPTED)
                     .body(new Message("Stories deleted successfully"));
         } else {
-            throw new ContentNotFoundException("No stories found for author: " + author);
+            throw new ContentNotFoundException();
         }
     }
 

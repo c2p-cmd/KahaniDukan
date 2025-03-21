@@ -24,7 +24,7 @@ public class TextProcessorController {
     public List<WordFrequency> getWordFrequencyOf(@RequestParam String storyId, @RequestParam(defaultValue = "10") int limit) {
         final Story story = storyService.getStoryById(storyId);
         if (story == null) {
-            throw new ContentNotFoundException("Story not found for id: " + storyId);
+            throw new ContentNotFoundException();
         }
         final String text = story.story();
         return textProcessorService.getWordFrequency(text, limit);
@@ -34,7 +34,7 @@ public class TextProcessorController {
     public Message summarize(@RequestParam String storyId) {
         final Story story = storyService.getStoryById(storyId);
         if (story == null) {
-            throw new ContentNotFoundException("Story not found for id: " + storyId);
+            throw new ContentNotFoundException();
         }
         final String text = story.story();
         return new Message(textProcessorService.summarizeText(text, 3));
