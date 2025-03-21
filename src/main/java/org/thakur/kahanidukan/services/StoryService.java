@@ -64,7 +64,7 @@ public class StoryService {
                 .toList();
     }
 
-    public Story getStoryById(String id) {
+    public Story getStoryById(String id) throws ContentNotFoundException {
         return storyRepository.findById(id).orElseThrow(() -> new ContentNotFoundException("Story not found for id: " + id));
     }
 
