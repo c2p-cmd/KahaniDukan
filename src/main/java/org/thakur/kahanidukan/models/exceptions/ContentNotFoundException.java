@@ -1,4 +1,4 @@
-package org.thakur.kahanidukan.models;
+package org.thakur.kahanidukan.models.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

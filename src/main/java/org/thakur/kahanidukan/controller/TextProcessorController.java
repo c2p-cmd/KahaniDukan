@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.thakur.kahanidukan.models.*;
 
+import org.thakur.kahanidukan.models.exceptions.ContentNotFoundException;
 import org.thakur.kahanidukan.services.*;
 
 import java.util.List;
