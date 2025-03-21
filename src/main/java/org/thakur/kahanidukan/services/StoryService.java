@@ -42,7 +42,7 @@ public class StoryService {
         return stories.get(randomIndex);
     }
 
-    public List<Story> getStoriesByAuthor(String author) {
+    public List<Story> getStoriesByAuthor(String author) throws AuthorNotFoundException {
         if (author == null || author.isBlank() || author.equalsIgnoreCase("null")) {
             throw new AuthorNotFoundException("Author not found");
         }
@@ -68,7 +68,7 @@ public class StoryService {
         return storyRepository.findById(id).orElseThrow(() -> new ContentNotFoundException("Story not found for id: " + id));
     }
 
-    public void removeStoryById(String id) {
+    public void removeStoryById(String id) throws ContentNotFoundException {
         storyRepository
             .findById(id)
             .ifPresentOrElse(
