@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.thakur.kahanidukan.models.exceptions.AuthorNotFoundException;
 import org.thakur.kahanidukan.models.exceptions.ContentNotFoundException;
+import org.thakur.kahanidukan.models.exceptions.DateTimeInFutureException;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,13 +31,13 @@ public record Story(
             this.id = id;
         }
         if (title.isBlank() || title.equalsIgnoreCase("null")) {
-            throw new ContentNotFoundException("Title is required");
+            throw new ContentNotFoundException();
         }
         if (story.isBlank() || story.equalsIgnoreCase("null")) {
-            throw new ContentNotFoundException("Story is required");
+            throw new ContentNotFoundException();
         }
         if (moral.isBlank() || moral.equalsIgnoreCase("null")) {
-            throw new ContentNotFoundException("Moral is required");
+            throw new ContentNotFoundException();
         }
         if (author.isBlank() || author.equalsIgnoreCase("null")) {
             throw new AuthorNotFoundException("Author is required");
@@ -47,7 +48,7 @@ public record Story(
             final ZonedDateTime now = ZonedDateTime.now();
             final ZonedDateTime dateTime = ZonedDateTime.parse(datetime, Story.formatter);
             if (dateTime.isAfter(now)) {
-                throw new ContentNotFoundException("Datetime cannot be in the future");
+                throw new DateTimeInFutureException();
             }
             this.datetime = datetime;
         }
