@@ -1,0 +1,44 @@
+graph LR
+    Client((Client)) <--> RestAPI[REST API Controllers]
+
+    RestAPI --> StoryController[Story Controller]
+    RestAPI --> TextProcessorController[Text Processor Controller]
+
+    StoryController --> StoryService[Story Service]
+    TextProcessorController --> TextProcessorService[Text Processor Service]
+
+    %% Service Layer
+    subgraph "Story Operations"
+        StoryService -->|getAllStories| GetAll[Get All Stories]
+        StoryService -->|getAllStoriesSortedByDate| GetSorted[Get Sorted Stories]
+        StoryService -->|getRandomStory| GetRandom[Get Random Story]
+        StoryService -->|getStoriesByAuthor| GetByAuthor[Get Stories by Author]
+        StoryService -->|addStory| AddStory[Add New Story]
+        StoryService -->|removeStoryById| RemoveStory[Remove Story]
+        StoryService -->|searchStories| SearchStories[Search Stories]
+    end
+
+    subgraph "DB Interaction"
+        GetRandom --> StoryRepository
+        AddStory --> StoryRepository
+        RemoveStory --> StoryRepository
+        GetByAuthor --> StoryRepository
+        GetAll --> StoryRepository
+        GetSorted --> StoryRepository
+
+        StoryRepository --> MongoDB
+
+        SearchStories --> StorySearchRepository
+
+        StorySearchRepository --> MongoDB
+    end
+
+    subgraph "Text Processing"
+        TextProcessorService -->|getWordFrequency| WordFreq[Word Frequency Analysis]
+        TextProcessorService -->|top10LongestStories| GetTop10[Get Top 10 Longest]
+        TextProcessorService -->|summarizeText| Summarize[TextRank Summarization]
+    end
+
+    subgraph "NLP Processing"
+        Summarize --> NLPModels[Apache OpenNLP Models]
+    end
