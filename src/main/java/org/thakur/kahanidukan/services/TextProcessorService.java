@@ -49,7 +49,8 @@ public class TextProcessorService {
                 "with", "as", "for", "on", "was", "of", "a", "an", "are", "be", "by", "this");
         final Pattern pattern = Pattern.compile("[^a-zA-Z]");
 
-        var wordCount = Arrays.stream(text.toLowerCase().split("\\s+"))
+        final Map<String, Long> wordCount = Arrays
+                .stream(text.toLowerCase().split(" "))
                 .map(word -> pattern.matcher(word).replaceAll(""))
                 .filter(word -> !word.isEmpty() && !stopWords.contains(word))
                 .collect(Collectors.groupingBy(
