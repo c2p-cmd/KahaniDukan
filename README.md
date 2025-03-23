@@ -3,6 +3,8 @@
 A Spring Boot application for managing and searching stories with MongoDB.
 <br> This project demonstrates CRUD operations, text search, and RESTful API design.
 
+[Project Report 📝](https://c2p-cmd.notion.site/KahaniDukan-Project-Report-1816af6b04c280ffb2a9ca9400b8acbd)
+
 ## Features
 
 - Create, read, update, and delete stories
