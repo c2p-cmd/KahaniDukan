@@ -68,7 +68,7 @@ public class StoryService {
     }
 
     public Story getStoryById(String id) throws ContentNotFoundException {
-        return storyRepository.findById(id).orElseThrow(() -> new ContentNotFoundException("Story not found for id: " + id));
+        return storyRepository.findById(id).orElseThrow(ContentNotFoundException::new);
     }
 
     public void removeStoryById(String id) throws ContentNotFoundException {
@@ -77,7 +77,7 @@ public class StoryService {
             .ifPresentOrElse(
                 storyRepository::delete,
                 () -> {
-                    throw new ContentNotFoundException("Story not found for id: " + id);
+                    throw new ContentNotFoundException();
                 }
             );
     }
